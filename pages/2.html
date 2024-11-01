@@ -1,24 +1,116 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-<title>Map</title>
-<link rel="stylesheet" type="text/css" href="../style.css">
+    <meta charset="UTF-8">
+    <title>Map</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column; /* Убедитесь, что заголовки и изображение расположены вертикально */
+            align-items: center; /* Центрирует элементы по горизонтали */
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .image-container {
+            position: relative; /* Чтобы фишка могла позиционироваться относительно контейнера */
+            max-width: 100%; /* Максимальная ширина контейнера */
+            margin-bottom: 20px; /* Отступ снизу для кнопки */
+        }
+
+        .background-image {
+            width: 100%; /* Ширина изображения */
+            height: auto; /* Сохраняет пропорции изображения */
+        }
+
+        .piece {
+            position: absolute; /* Позволяет перемещать фишку по картинке */
+            width: 50px; /* Размер фишки */
+            height: 50px; /* Размер фишки */
+            border-radius: 50%; /* Делает фишку круглой */
+            cursor: pointer; /* Изменяет указатель при наведении */
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
 <body>
-<h1>Твоя судьба на этой карте</h1>
-<img src="../photo/game_map.png" alt="Али">
-<h2>Мохамед Али - он же Касиус Клей</h2>
-<h2>Нельзя не упомянуть нашего чемпиона по боксу - Александра Усика</h2>
-<img src="../photo/usik.jpg" alt="Усик">
-<h2>Совсем недавно он стал чемпионом по боксу в супертяжелой весовой категории!!!</h2>
-<img src="../photo/jordan.jpg" alt="Джордан">
-<h2>Майкл Джордан</h2>
-<img src="../photo/kobe.jpg" alt="Кобе">
-<h2>Кобе Брайент</h2>
-<img src="../photo/lebron.jpg" alt="Леброн">
-<h2>Леброн Джеймс</h2>
+    <h1>Твоя судьба на этой карте</h1>
+    
+    <div class="image-container" id="image-container">
+        <img src="../photo/game_map.png" alt="map" class="background-image">
+    </div>
 
+    <button id="add-piece">Добавить фишку</button>
 
+    <h2>Мохамед Али - он же Касиус Клей</h2>
+    <h2>Нельзя не упомянуть нашего чемпиона по боксу - Александра Усика</h2>
+    <img src="../photo/usik.jpg" alt="Усик">
+    <h2>Совсем недавно он стал чемпионом по боксу в супертяжелой весовой категории!!!</h2>
+    <img src="../photo/jordan.jpg" alt="Джордан">
+    <h2>Майкл Джордан</h2>
+    <img src="../photo/kobe.jpg" alt="Кобе">
+    <h2>Кобе Брайент</h2>
+    <img src="../photo/lebron.jpg" alt="Леброн">
+    <h2>Леброн Джеймс</h2>
 
+    <script>
+        const imageContainer = document.getElementById('image-container');
+        const addPieceButton = document.getElementById('add-piece');
+
+        // Функция для генерации случайного цвета
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // Функция для добавления новой фишки
+        function addNewPiece() {
+            const newPiece = document.createElement('div');
+            newPiece.classList.add('piece');
+            newPiece.style.backgroundColor = getRandomColor(); // Устанавливаем случайный цвет
+
+            // Получаем размеры и позицию кнопки
+            const buttonRect = addPieceButton.getBoundingClientRect();
+            const x = buttonRect.left + window.scrollX; // X-координата кнопки
+            const y = buttonRect.bottom + window.scrollY; // Y-координата кнопки (ниже кнопки)
+
+            newPiece.style.left = `${x}px`;
+            newPiece.style.top = `${y}px`;
+
+            // Добавляем обработчик перемещения фишки
+            newPiece.addEventListener('mousedown', (e) => {
+                const offsetX = e.clientX - newPiece.getBoundingClientRect().left;
+                const offsetY = e.clientY - newPiece.getBoundingClientRect().top;
+
+                const movePiece = (moveEvent) => {
+                    const container = newPiece.parentElement; // Получаем контейнер для фишки
+                    const containerRect = container.getBoundingClientRect();
+
+                    // Ограничиваем перемещение фишки в пределах контейнера
+                    const newX = Math.min(containerRect.width - newPiece.offsetWidth, Math.max(0, moveEvent.clientX - containerRect.left - offsetX));
+                    const newY = Math.min(containerRect.height - newPiece.offsetHeight, Math.max(0, moveEvent.clientY - containerRect.top - offsetY));
+
+                    newPiece.style.left = newX + 'px';
+                    newPiece.style.top = newY + 'px';
+                };
+
+                document.addEventListener('mousemove', movePiece);
+
+                document.addEventListener('mouseup', () => {
+                    document.removeEventListener('mousemove', movePiece);
+                }, { once: true });
+            });
+
+            imageContainer.appendChild(newPiece); // Добавляем новую фишку в контейнер
+        }
+
+        // Добавляем обработчик события клика на кнопку добавления фишки
+        addPieceButton.addEventListener('click', addNewPiece);
+    </script>
 </body>
 </html>
